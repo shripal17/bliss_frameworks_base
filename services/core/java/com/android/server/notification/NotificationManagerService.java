@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2015 The CyanogenMod Project
+ * Copyright (C) 2017 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,6 +254,7 @@ import android.content.pm.UserInfo;
 import android.content.pm.VersionedPackage;
 import android.content.res.Resources;
 import android.database.ContentObserver;
+import android.media.AudioManager;
 import android.metrics.LogMaker;
 import android.net.Uri;
 import android.os.Binder;
@@ -377,6 +380,9 @@ import com.android.server.utils.quota.MultiRateLimiter;
 import com.android.server.wm.ActivityTaskManagerInternal;
 import com.android.server.wm.BackgroundActivityStartCallback;
 import com.android.server.wm.WindowManagerInternal;
+
+import com.android.internal.bliss.notification.LedValues;
+import com.android.internal.bliss.notification.LineageNotificationLights;
 
 import libcore.io.IoUtils;
 
@@ -630,6 +636,7 @@ public class NotificationManagerService extends SystemService {
     PackageManagerInternal mPackageManagerInternal;
     private PermissionManager mPermissionManager;
     private PermissionPolicyInternal mPermissionPolicyInternal;
+    AudioManager mAudioManager;
 
     // Can be null for wear
     @Nullable StatusBarManagerInternal mStatusBar;
@@ -668,6 +675,10 @@ public class NotificationManagerService extends SystemService {
     private int mListenerHints;  // right now, all hints are global
     private int mInterruptionFilter = NotificationListenerService.INTERRUPTION_FILTER_UNKNOWN;
 
+    boolean mScreenOn = true;
+    protected boolean mInCallStateOffHook = false;
+    boolean mNotificationPulseEnabled;
+
     private SystemUiSystemPropertiesFlags.FlagResolver mFlagResolver;
 
     // used as a mutex for access to all active notifications & listeners
@@ -695,6 +706,9 @@ public class NotificationManagerService extends SystemService {
 
     // Used for rate limiting toasts by package.
     private MultiRateLimiter mToastRateLimiter;
+
+    // The last key in this list owns the hardware.
+    ArrayList<String> mLights = new ArrayList<>();
 
     private AppOpsManager mAppOps;
     private UsageStatsManagerInternal mAppUsageStats;
@@ -769,6 +783,7 @@ public class NotificationManagerService extends SystemService {
 
     // Broadcast intent receiver for notification permissions review-related intents
     private ReviewNotificationPermissionsReceiver mReviewNotificationPermissionsReceiver;
+    private LineageNotificationLights mLineageNotificationLights;
 
     private AppOpsManager.OnOpChangedListener mAppOpsListener;
 
@@ -2109,6 +2124,12 @@ public class NotificationManagerService extends SystemService {
                             REASON_PROFILE_TURNED_OFF);
                     mSnoozeHelper.clearData(userHandle);
                 }
+                if (mNotificationLight != null) {
+                    // if lights with screen on is disabled.
+                    if (!mLineageNotificationLights.showLightsScreenOn()) {
+                        mNotificationLight.turnOff();
+                    }
+                }
             } else if (action.equals(Intent.ACTION_USER_SWITCHED)) {
                 if (!Flags.useSsmUserSwitchSignal()) {
                     final int userId = intent.getIntExtra(Intent.EXTRA_USER_HANDLE, USER_NULL);
@@ -2530,6 +2551,7 @@ public class NotificationManagerService extends SystemService {
                             new Intent(ACTION_INTERRUPTION_FILTER_CHANGED_INTERNAL)
                                     .addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT),
                             UserHandle.ALL, android.Manifest.permission.MANAGE_NOTIFICATIONS);
+                    mLineageNotificationLights.setZenMode(mZenModeHelper.getZenMode());
                     synchronized (mNotificationLock) {
                         updateInterruptionFilterLocked();
                     }
@@ -2823,8 +2845,16 @@ public class NotificationManagerService extends SystemService {
                 getContext().getSystemService(PowerManager.class),
                 new PostNotificationTrackerFactory() {});
 
+        mLineageNotificationLights = new LineageNotificationLights(getContext(),
+                 new LineageNotificationLights.LedUpdater() {
+            public void update() {
+                updateNotificationPulse();
+            }
+        });
+
         publishBinderService(Context.NOTIFICATION_SERVICE, mService, /* allowIsolated= */ false,
                 DUMP_FLAG_PRIORITY_CRITICAL | DUMP_FLAG_PRIORITY_NORMAL);
+        publishBinderService(Context.NOTIFICATION_SERVICE, mService);
         publishLocalService(NotificationManagerInternal.class, mInternalService);
     }
 
@@ -10775,6 +10805,39 @@ public class NotificationManagerService extends SystemService {
         }
     }
 
+    private boolean isLedForcedOn(NotificationRecord nr) {
+        return nr != null && mLineageNotificationLights.isForcedOn(nr.getSbn().getNotification());
+    }
+
+    @GuardedBy("mNotificationLock")
+    void updateLightsLocked()
+    {
+        if (mNotificationLight == null) {
+            return;
+        }
+        // handle notification lights
+        NotificationRecord ledNotification = null;
+        while (ledNotification == null && !mLights.isEmpty()) {
+            final String owner = mLights.get(mLights.size() - 1);
+            ledNotification = mNotificationsByKey.get(owner);
+            if (ledNotification == null) {
+                Slog.wtfStack(TAG, "LED Notification does not exist: " + owner);
+                mLights.remove(owner);
+            }
+        }
+        // Don't flash while we are in a call or screen is on
+        if (ledNotification == null || isInCall() || mScreenOn) {
+            mNotificationLight.turnOff();
+        } else {
+            NotificationRecord.Light light = ledNotification.getLight();
+            if (light != null && mNotificationPulseEnabled) {
+                // pulse repeatedly
+                mNotificationLight.setFlashing(light.color, LogicalLight.LIGHT_FLASH_TIMED,
+                        light.onMs, light.offMs);
+            }
+        }
+    }
+
     @GuardedBy("mNotificationLock")
     @NonNull
     List<NotificationRecord> findCurrentAndSnoozedGroupNotificationsLocked(String pkg,
@@ -10988,6 +11051,12 @@ public class NotificationManagerService extends SystemService {
                 }, delay);
                 delay += 20;
             }
+        }
+    }
+
+    private void updateNotificationPulse() {
+        synchronized (mNotificationLock) {
+            updateLightsLocked();
         }
     }
 
@@ -11359,6 +11428,18 @@ public class NotificationManagerService extends SystemService {
                 return sbnClone;
             }
         }
+    }
+
+    private boolean isInCall() {
+        if (mInCallStateOffHook) {
+            return true;
+        }
+        int audioMode = mAudioManager.getMode();
+        if (audioMode == AudioManager.MODE_IN_CALL
+                || audioMode == AudioManager.MODE_IN_COMMUNICATION) {
+            return true;
+        }
+        return false;
     }
 
     public class NotificationAssistants extends ManagedServices {
