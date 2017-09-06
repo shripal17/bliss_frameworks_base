@@ -202,6 +202,7 @@ public class RescueParty {
      * will not be fully booted at this time.
      */
     public static boolean isRecoveryTriggeredReboot() {
+        if (isDisabled()) return false;
         return isFactoryResetPropertySet() || isRebootPropertySet();
     }
 
@@ -242,6 +243,7 @@ public class RescueParty {
      */
     public static void onSettingsProviderPublished(Context context) {
         if (!Flags.deprecateFlagsAndSettingsResets()) {
+            if (isDisabled()) return;
             handleNativeRescuePartyResets();
             ContentResolver contentResolver = context.getContentResolver();
             DeviceConfig.setMonitorCallback(
