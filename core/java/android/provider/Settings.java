@@ -6650,6 +6650,13 @@ public final class Settings {
          */
         public static final String RECENTS_LOCKED_TASKS = "recents_locked_tasks";
 
+        /**
+         *  Enable statusbar double tap gesture on to put device to sleep
+         *  0 = 0ff, 1 = on
+         * @hide
+         */
+        public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
+
 	/**
          * GameSpace: List of added games by user
          * @hide
