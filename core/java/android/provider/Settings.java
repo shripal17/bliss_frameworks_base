@@ -5163,6 +5163,13 @@ public final class Settings {
         public static final String SCREEN_BRIGHTNESS = "screen_brightness";
 
         /**
+         * The screen backlight brightness between 0.0f and 1.0f.
+         * @hide
+         */
+        @Readable
+        public static final String SCREEN_BRIGHTNESS_FLOAT = "screen_brightness_float";
+
+        /**
          * Controls whether to enable automatic brightness mode. Value can be set to
          * {@link #SCREEN_BRIGHTNESS_MODE_MANUAL} or {@link #SCREEN_BRIGHTNESS_MODE_AUTOMATIC}.
          * If {@link #SCREEN_BRIGHTNESS_MODE_AUTOMATIC} is set, the system may change
@@ -7009,6 +7016,13 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
+
+        /**
+         * Whether to control brightness from status bar
+         * 0 = 0ff, 1 = on
+         * @hide
+         */
+        public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
         /**
          * These are all public system settings

@@ -141,6 +141,7 @@ public class NotificationShadeWindowViewController implements Dumpable {
     private DragDownHelper mDragDownHelper;
     private boolean mExpandingBelowNotch;
     private final DockManager mDockManager;
+    private final NotificationPanelViewController mNotificationPanelViewController;
     private final ShadeViewController mShadeViewController;
     private final PanelExpansionInteractor mPanelExpansionInteractor;
     private final ShadeExpansionStateManager mShadeExpansionStateManager;
@@ -172,6 +173,7 @@ public class NotificationShadeWindowViewController implements Dumpable {
             DockManager dockManager,
             NotificationShadeDepthController depthController,
             NotificationShadeWindowView notificationShadeWindowView,
+            NotificationPanelViewController notificationPanelViewController,
             ShadeViewController shadeViewController,
             PanelExpansionInteractor panelExpansionInteractor,
             ShadeExpansionStateManager shadeExpansionStateManager,
@@ -208,6 +210,7 @@ public class NotificationShadeWindowViewController implements Dumpable {
         mStatusBarStateController = statusBarStateController;
         mView = notificationShadeWindowView;
         mDockManager = dockManager;
+        mNotificationPanelViewController = notificationPanelViewController;
         mShadeViewController = shadeViewController;
         mPanelExpansionInteractor = panelExpansionInteractor;
         mShadeExpansionStateManager = shadeExpansionStateManager;
@@ -800,5 +803,11 @@ public class NotificationShadeWindowViewController implements Dumpable {
     @VisibleForTesting
     void setDragDownHelper(DragDownHelper dragDownHelper) {
         mDragDownHelper = dragDownHelper;
+    }
+
+    public void fling(float vel, boolean expand, boolean expandBecauseOfFalsing) {
+        if (mNotificationPanelViewController != null) {
+            mNotificationPanelViewController.fling(vel, expand, expandBecauseOfFalsing);
+        }
     }
 }
