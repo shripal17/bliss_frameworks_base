@@ -260,4 +260,7 @@ interface INotificationManager
 
     void setCanBePromoted(String pkg, int uid, boolean promote);
     boolean canBePromoted(String pkg, int uid);
+
+    void forceShowLedLight(int color);
+    void forcePulseLedLight(int color, int onTime, int offTime);
 }
