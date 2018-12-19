@@ -34,6 +34,7 @@ import com.android.systemui.statusbar.policy.DevicePostureController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.util.settings.SecureSettings;
 import com.android.systemui.util.time.SystemClock;
+import com.android.systemui.tuner.TunerService;
 import com.android.systemui.volume.CsdWarningDialog;
 import com.android.systemui.volume.VolumeComponent;
 import com.android.systemui.volume.VolumeDialogComponent;
@@ -117,7 +118,8 @@ public interface VolumeModule {
             Lazy<SecureSettings> secureSettings,
             VibratorHelper vibratorHelper,
             SystemClock systemClock,
-            VolumeDialogInteractor interactor) {
+            VolumeDialogInteractor interactor,
+            TunerService tunerService) {
         VolumeDialogImpl impl = new VolumeDialogImpl(
                 context,
                 volumeDialogController,
@@ -137,7 +139,8 @@ public interface VolumeModule {
                 secureSettings,
                 vibratorHelper,
                 systemClock,
-                interactor);
+                interactor,
+                tunerService);
         impl.setStreamImportant(AudioManager.STREAM_SYSTEM, false);
         impl.setAutomute(true);
         impl.setSilentMode(false);

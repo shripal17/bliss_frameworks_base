@@ -84,6 +84,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController;
 import com.android.systemui.statusbar.policy.DevicePostureController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.statusbar.policy.FakeConfigurationController;
+import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.settings.FakeSettings;
 import com.android.systemui.util.settings.SecureSettings;
 import com.android.systemui.util.time.FakeSystemClock;
@@ -140,6 +141,8 @@ public class VolumeDialogImplTest extends SysuiTestCase {
     DeviceProvisionedController mDeviceProvisionedController;
     @Mock
     MediaOutputDialogManager mMediaOutputDialogManager;
+    @Mock
+    TunerService mTunerService;
     @Mock
     InteractionJankMonitor mInteractionJankMonitor;
     @Mock
@@ -223,7 +226,8 @@ public class VolumeDialogImplTest extends SysuiTestCase {
                 mLazySecureSettings,
                 mVibratorHelper,
                 new FakeSystemClock(),
-                mVolumeDialogInteractor);
+                mVolumeDialogInteractor,
+                mTunerService);
         mDialog.init(0, null);
         State state = createShellState();
         mDialog.onStateChangedH(state);
@@ -485,6 +489,10 @@ public class VolumeDialogImplTest extends SysuiTestCase {
     @Test
     public void ifPortraitHalfOpen_drawVerticallyTop() {
         mDialog.onPostureChanged(DevicePostureController.DEVICE_POSTURE_HALF_OPENED);
+
+        VolumeDialogImpl dialog = new VolumeDialogImpl(
+                mTunerService
+        );
         mTestableLooper.processAllMessages(); // let dismiss() finish
 
         setOrientation(Configuration.ORIENTATION_PORTRAIT);
@@ -500,6 +508,10 @@ public class VolumeDialogImplTest extends SysuiTestCase {
     @Test
     public void ifPortraitAndOpen_drawCenterVertically() {
         mDialog.onPostureChanged(DevicePostureController.DEVICE_POSTURE_OPENED);
+
+        VolumeDialogImpl dialog = new VolumeDialogImpl(
+                mTunerService
+        );
         mTestableLooper.processAllMessages(); // let dismiss() finish
 
         setOrientation(Configuration.ORIENTATION_PORTRAIT);
@@ -514,6 +526,10 @@ public class VolumeDialogImplTest extends SysuiTestCase {
     @Test
     public void ifLandscapeAndHalfOpen_drawCenterVertically() {
         mDialog.onPostureChanged(DevicePostureController.DEVICE_POSTURE_HALF_OPENED);
+
+        VolumeDialogImpl dialog = new VolumeDialogImpl(
+                mTunerService
+        );
         mTestableLooper.processAllMessages(); // let dismiss() finish
 
         setOrientation(Configuration.ORIENTATION_LANDSCAPE);
@@ -533,6 +549,9 @@ public class VolumeDialogImplTest extends SysuiTestCase {
 
     @Test
     public void dialogDestroy_removesPostureControllerCallback() {
+        VolumeDialogImpl dialog = new VolumeDialogImpl(
+                mTunerService
+        );
         verify(mPostureController, never()).removeCallback(any());
         mDialog.destroy();
         verify(mPostureController).removeCallback(any());
