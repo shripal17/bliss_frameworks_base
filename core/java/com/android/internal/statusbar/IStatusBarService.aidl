@@ -239,4 +239,6 @@ interface IStatusBarService
      * BlissRoms additions
      */
     void toggleCameraFlash();
+
+    void screenPinningStateChanged(boolean enabled);
 }
