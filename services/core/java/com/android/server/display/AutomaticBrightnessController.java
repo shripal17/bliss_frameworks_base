@@ -44,6 +44,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.Trace;
+import android.provider.Settings;
 import android.util.EventLog;
 import android.util.IndentingPrintWriter;
 import android.util.MathUtils;
@@ -285,6 +286,8 @@ public class AutomaticBrightnessController {
 
     private final DisplayManagerFlags mDisplayManagerFlags;
 
+    private boolean mAutoBrightnessOneShot;
+
     AutomaticBrightnessController(Callbacks callbacks, Looper looper,
             SensorManager sensorManager, Sensor lightSensor,
             SparseArray<BrightnessMappingStrategy> brightnessMappingStrategyMap,
@@ -375,6 +378,7 @@ public class AutomaticBrightnessController {
         mBrightnessThrottler = brightnessThrottler;
         mBrightnessMappingStrategyMap = brightnessMappingStrategyMap;
         mDisplayManagerFlags = displayManagerFlags;
+        mAutoBrightnessOneShot = false;
 
         // Use the given short-term model
         if (userNits != BrightnessMappingStrategy.INVALID_NITS) {
@@ -448,7 +452,7 @@ public class AutomaticBrightnessController {
     public void configure(int state, @Nullable BrightnessConfiguration configuration,
             float brightness, boolean userChangedBrightness, float adjustment,
             boolean userChangedAutoBrightnessAdjustment, int displayPolicy, int displayState,
-            boolean useNormalBrightnessForDoze, boolean shouldResetShortTermModel) {
+            boolean useNormalBrightnessForDoze, boolean shouldResetShortTermModel, boolean autoBrightnessOneShot) {
         mState = state;
         boolean changed = setBrightnessConfiguration(configuration, shouldResetShortTermModel);
         changed |= setDisplayPolicy(displayPolicy);
@@ -478,6 +482,8 @@ public class AutomaticBrightnessController {
 
         if (changed) {
             updateAutoBrightness(false /*sendUpdate*/, userInitiatedChange);
+        } else {
+            handleSettingsChange(autoBrightnessOneShot);
         }
     }
 
@@ -517,6 +523,16 @@ public class AutomaticBrightnessController {
 
     float getFastAmbientLux() {
         return mFastAmbientLux;
+    }
+
+    private void handleSettingsChange(boolean autoBrightnessOneShot) {
+        if (mAutoBrightnessOneShot && !autoBrightnessOneShot) {
+            mSensorManager.registerListener(mLightSensorListener, mLightSensor,
+                    mCurrentLightSensorRate * 1000, mHandler);
+        } else if (!mAutoBrightnessOneShot && autoBrightnessOneShot) {
+            mSensorManager.unregisterListener(mLightSensorListener);
+        }
+        mAutoBrightnessOneShot = autoBrightnessOneShot;
     }
 
     private boolean setDisplayPolicy(int policy) {
@@ -1031,6 +1047,9 @@ public class AutomaticBrightnessController {
             if (sendUpdate) {
                 mCallbacks.updateBrightness();
             }
+        }
+        if (mAutoBrightnessOneShot) {
+            mSensorManager.unregisterListener(mLightSensorListener);
         }
     }
 
