@@ -128,7 +128,6 @@ public class PhoneStatusBarView extends FrameLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mClockController.addDarkReceiver();
         if (updateDisplayParameters()) {
             updateLayoutForCutout();
             updateWindowHeight();
@@ -138,7 +137,6 @@ public class PhoneStatusBarView extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mClockController.removeDarkReceiver();
         mDisplayCutout = null;
     }
 
