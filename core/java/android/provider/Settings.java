@@ -7157,6 +7157,16 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String QS_BATTERY_STYLE = "qs_battery_style";
+
+        /**
+         * @hide
+         */
+        public static final String QS_SHOW_BATTERY_PERCENT = "qs_show_battery_percent";
+
+        /**
+         * @hide
+         */
         public static final String LOCKSCREEN_WEATHER_TEXT = "lockscreen_weather_text";
 
 	/**
