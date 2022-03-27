@@ -13728,6 +13728,13 @@ public final class Settings {
                 "quick_settings_tiles_anim_interpolator";
 
         /**
+         * Whether to show the brightness slider in quick settings panel.
+         * 0 = Top, 1 = Bottom
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_SLIDER_POSITION = "qs_brightness_slider_position";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
