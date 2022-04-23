@@ -51,6 +51,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import com.android.settingslib.Utils;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -148,6 +149,11 @@ public class InternetDialogDelegate implements
     private Switch mMobileDataToggle;
     private View mMobileToggleDivider;
     private View mMobileConnectedSpace;
+    private LinearLayout mFivegLayout;
+    private ImageView mFivegIcon;
+    private TextView mFivegTitleText;
+    private Switch mFivegToggle;
+    private View mFivegToggleDivider;
     private ImageView mHotspotIcon;
     private TextView mHotspotTitleText;
     private TextView mHotspotSummaryText;
@@ -182,6 +188,9 @@ public class InternetDialogDelegate implements
     private final CoroutineScope mCoroutineScope;
     @Nullable
     private Job mClickJob;
+    
+    // 5g toggle
+    private final boolean mShouldShowFivegToggle;
 
     // These are to reduce the UI janky frame duration. b/323286540
     private LifecycleRegistry mLifecycleRegistry;
@@ -234,6 +243,7 @@ public class InternetDialogDelegate implements
         mUiEventLogger = uiEventLogger;
         mDialogTransitionAnimator = dialogTransitionAnimator;
         mAdapter = new InternetAdapter(mInternetDialogController, coroutineScope);
+        mShouldShowFivegToggle = mInternetDialogController.isFivegSupported();
     }
 
     @Override
@@ -308,6 +318,11 @@ public class InternetDialogDelegate implements
         mMobileToggleDivider = mDialogView.requireViewById(R.id.mobile_toggle_divider);
         mMobileDataToggle = mDialogView.requireViewById(R.id.mobile_toggle);
         mMobileConnectedSpace = mDialogView.requireViewById(R.id.mobile_connected_space);
+        mFivegLayout = mDialogView.requireViewById(R.id.fiveg_layout);
+        mFivegIcon = mDialogView.requireViewById(R.id.fiveg_icon);
+        mFivegTitleText = mDialogView.requireViewById(R.id.fiveg_title);
+        mFivegToggleDivider = mDialogView.requireViewById(R.id.fiveg_toggle_divider);
+        mFivegToggle = mDialogView.requireViewById(R.id.fiveg_toggle);
         mHotspotIcon = mDialogView.requireViewById(R.id.hotspot_icon);
         mHotspotTitleText = mDialogView.requireViewById(R.id.hotspot_title);
         mHotspotSummaryText = mDialogView.requireViewById(R.id.hotspot_summary);
@@ -361,6 +376,7 @@ public class InternetDialogDelegate implements
         mLifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
         mMobileNetworkLayout.setOnClickListener(null);
         mMobileNetworkLayout.setOnLongClickListener(null);
+        mFivegToggle.setOnCheckedChangeListener(null);
         mMobileDataToggle.setOnClickListener(null);
         mHotspotLayout.setOnClickListener(null);
         mHotspotToggle.setOnCheckedChangeListener(null);
@@ -493,6 +509,9 @@ public class InternetDialogDelegate implements
                 mInternetDialogController.launchMobileNetworkSetting(v);
                 return true;
         });
+        mFivegToggle.setOnClickListener(v -> {
+            mInternetDialogController.setFivegEnabled(mFivegToggle.isChecked());
+        });
         mHotspotLayout.setOnClickListener(mInternetDialogController::launchHotspotSetting);
         mHotspotToggle.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> mInternetDialogController.setHotspotEnabled(isChecked));
@@ -599,6 +618,14 @@ public class InternetDialogDelegate implements
                     : R.color.disconnected_network_primary_color;
             mMobileToggleDivider.setBackgroundColor(dialog.getContext().getColor(primaryColor));
 
+            mFivegLayout.setVisibility(mShouldShowFivegToggle ? View.VISIBLE : View.GONE);
+            mFivegToggle.setChecked(mInternetDialogController.isFivegEnabled());
+            mFivegTitleText.setText(dialog.getContext().getText(R.string.enable_fiveg));
+            mFivegToggle.setVisibility(mCanConfigMobileData ? View.VISIBLE : View.INVISIBLE);
+            mFivegToggleDivider.setVisibility(
+                    mCanConfigMobileData ? View.VISIBLE : View.INVISIBLE);
+            mFivegToggleDivider.setBackgroundColor(dialog.getContext().getColor(primaryColor));
+
             // Display the info for the non-DDS if it's actively being used
             int autoSwitchNonDdsSubId = mInternetDialogController.getActiveAutoSwitchNonDdsSubId();
             int nonDdsVisibility = autoSwitchNonDdsSubId
@@ -665,6 +692,13 @@ public class InternetDialogDelegate implements
                         R.style.TextAppearance_InternetDialog_Active
                         : R.style.TextAppearance_InternetDialog);
                 mMobileSummaryText.setTextAppearance(secondaryRes);
+            	mFivegIcon.getDrawable().setTint(
+                        isNetworkConnected ? dialog.getContext().getColor(R.color.connected_network_primary_color)
+                        : Utils.getColorAttrDefaultColor(dialog.getContext(), android.R.attr.textColorTertiary));
+                mFivegTitleText.setTextAppearance(isNetworkConnected
+                        ?
+                        R.style.TextAppearance_InternetDialog_Active
+                        : R.style.TextAppearance_InternetDialog);
             }
 
             if (mSecondaryMobileNetworkLayout != null) {
