@@ -283,7 +283,9 @@ public class IconManager implements DemoModeCommandReceiver {
                 view.setLayoutParams(desired);
             }
         }
-        view.set(icon);
+        if (view instanceof StatusBarIconView) {
+            ((StatusBarIconView) view).set(icon);
+        }
     }
 
     /** Called once an icon holder has been set. */
