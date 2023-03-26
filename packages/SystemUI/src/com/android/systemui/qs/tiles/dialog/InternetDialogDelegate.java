@@ -865,9 +865,9 @@ public class InternetDialogDelegate implements
         } else if (mInternetDialogController.isHotspotEnabled()) {
             int numDevices = mInternetDialogController.getHotspotNumDevices();
             if (numDevices > 0) {
-                return mDialog.getContext().getResources().getQuantityString(
-                        R.plurals.quick_settings_internet_hotspot_summary_num_devices,
-                        numDevices, numDevices);
+                return icuMessageFormat(mDialog.getContext().getResources(),
+                        R.string.quick_settings_internet_hotspot_summary_num_devices,
+                        numDevices);
             }
             return mDialog.getContext().getString(R.string.switch_bar_on);
         }
