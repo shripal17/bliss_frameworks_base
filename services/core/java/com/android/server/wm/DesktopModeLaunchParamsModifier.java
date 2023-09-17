@@ -38,6 +38,11 @@ class DesktopModeLaunchParamsModifier implements LaunchParamsModifier {
     private static final boolean DEBUG = false;
 
     private StringBuilder mLogBuilder;
+    private static final int OFFSET_X_DP = 100;
+    private static final int OFFSET_Y_DP = 100;
+
+    private int mLastOffsetX = 0;
+    private int mLastOffsetY = 0;
 
     @NonNull private final Context mContext;
 
