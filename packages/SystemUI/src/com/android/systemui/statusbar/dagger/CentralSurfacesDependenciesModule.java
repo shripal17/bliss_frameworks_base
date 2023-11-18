@@ -63,6 +63,7 @@ import com.android.systemui.statusbar.phone.ui.StatusBarIconController;
 import com.android.systemui.statusbar.phone.ui.StatusBarIconControllerImpl;
 import com.android.systemui.statusbar.phone.ui.StatusBarIconList;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
+import com.android.systemui.tuner.TunerService;
 
 import dagger.Binds;
 import dagger.Lazy;
@@ -101,7 +102,8 @@ public interface CentralSurfacesDependenciesModule {
             MediaDataManager mediaDataManager,
             DumpManager dumpManager,
             @Background Executor backgroundExecutor,
-            @Main Handler handler) {
+            @Main Handler handler,
+            TunerService tunerService) {
         return new NotificationMediaManager(
                 context,
                 visibilityProvider,
@@ -110,7 +112,8 @@ public interface CentralSurfacesDependenciesModule {
                 mediaDataManager,
                 dumpManager,
                 backgroundExecutor,
-                handler);
+                handler,
+                tunerService);
     }
 
     /** */
