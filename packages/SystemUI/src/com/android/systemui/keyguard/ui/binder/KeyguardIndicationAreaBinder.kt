@@ -54,6 +54,7 @@ object KeyguardIndicationAreaBinder {
         viewModel: KeyguardIndicationAreaViewModel,
         indicationController: KeyguardIndicationController,
     ): DisposableHandle {
+        indicationController.setIndicationAreaTop(view)
         val disposables = DisposableHandles()
 
         // As the indication controller is a singleton, reset the view back to the previous view
