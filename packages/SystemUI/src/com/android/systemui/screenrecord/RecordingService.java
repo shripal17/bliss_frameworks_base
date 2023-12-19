@@ -279,12 +279,10 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
                 ContentResolver resolver = getContentResolver();
                 Uri uri = Uri.parse(intent.getStringExtra(EXTRA_PATH));
                 resolver.delete(uri, null, null);
-
                 Toast.makeText(
                         this,
                         R.string.screenrecord_delete_description,
                         Toast.LENGTH_LONG).show();
-
                 // Remove notification
                 final int id = intent.getIntExtra(EXTRA_ID, mNotificationId);
                 mNotificationManager.cancelAsUser(null, id, currentUser);
@@ -500,7 +498,7 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
     /** Posts a group summary notification for the given group. */
     private void postGroupSummaryNotification(
             UserHandle currentUser, String notificationContentTitle, String groupKey) {
-        if (countGroupNotifications() < 1)
+        if (countGroupNotifications() < 2)
             return; // only post after we show the 2nd notification
         Bundle extras = new Bundle();
         extras.putString(Notification.EXTRA_SUBSTITUTE_APP_NAME,
@@ -589,9 +587,9 @@ public class RecordingService extends Service implements ScreenMediaRecorderList
             try {
                 Log.d(getTag(), "saving recording");
                 postGroupSummaryNotificationForSaves(currentUser);
+                mNotificationManager.cancelAsUser(null, PROGRESS_NOTIF_ID, currentUser);
                 Notification notification = createSaveNotification(
                         getRecorder() != null ? getRecorder().save() : null);
-                mNotificationManager.cancelAsUser(null, PROGRESS_NOTIF_ID, currentUser);
                 mNotificationManager.notifyAsUser(null, mNotificationId, notification,
                         currentUser);
             } catch (IOException | IllegalStateException e) {
