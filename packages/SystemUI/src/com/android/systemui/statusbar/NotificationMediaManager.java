@@ -207,7 +207,7 @@ public class NotificationMediaManager implements Dumpable, TunerService.Tunable 
                 mIslandEnabled = TunerService.parseIntegerSwitch(newValue, false);
                 break;
             case ISLAND_NOTIFICATION_NOW_PLAYING:
-                mIslandNowPlayingEnabled = TunerService.parseIntegerSwitch(newValue, true);
+                mIslandNowPlayingEnabled = TunerService.parseIntegerSwitch(newValue, false);
                 break;
             default:
                 break;
