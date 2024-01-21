@@ -115,7 +115,7 @@ public class LockIconView extends FrameLayout implements Dumpable {
      * Whether or not to render the lock icon background. Mainly used for UDPFS.
      */
     public void setUseBackground(boolean useBackground) {
-        mUseBackground = useBackground;
+        mUseBackground = false;
         updateColorAndBackgroundVisibility();
     }
 
