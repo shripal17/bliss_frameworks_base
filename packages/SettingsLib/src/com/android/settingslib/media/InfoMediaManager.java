@@ -154,7 +154,7 @@ public abstract class InfoMediaManager {
             @Nullable MediaController mediaController) {
         mContext = context;
         mBluetoothManager = localBluetoothManager;
-        mPackageName = packageName;
+        mPackageName = (packageName == null) ? "" : packageName;
         mUserHandle = userHandle;
         mMediaController = mediaController;
         if (mediaController != null) {
