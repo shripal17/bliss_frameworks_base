@@ -20,12 +20,15 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.DrawableRes
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Point
 import android.graphics.Rect
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.InputDevice
 import android.view.MotionEvent
+import android.os.UserHandle
+import android.provider.Settings
 import android.view.View
 import android.view.View.OnLayoutChangeListener
 import android.view.View.VISIBLE
@@ -110,6 +113,7 @@ object KeyguardRootViewBinder {
         configuration: ConfigurationState,
         occludingAppDeviceEntryMessageViewModel: OccludingAppDeviceEntryMessageViewModel?,
         chipbarCoordinator: ChipbarCoordinator?,
+        context: Context,
         screenOffAnimationController: ScreenOffAnimationController,
         shadeInteractor: ShadeInteractor,
         clockInteractor: KeyguardClockInteractor,
@@ -385,10 +389,16 @@ object KeyguardRootViewBinder {
                                         authInteractionProperties,
                                     )
                                 } else {
+                                var FingerprintVib : Boolean = Settings.System.getIntForUser(
+                                            context.contentResolver,
+                                            Settings.System.FP_SUCCESS_VIBRATE, 1, UserHandle.USER_CURRENT) == 1
+                                if (FingerprintVib) {
                                     vibratorHelper.performHapticFeedback(
                                         view,
-                                        HapticFeedbackConstants.BIOMETRIC_CONFIRM,
+                                        HapticFeedbackConstants.CONFIRM,
+                                        HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING,
                                     )
+                                }
                                 }
                             }
                         }
@@ -401,10 +411,16 @@ object KeyguardRootViewBinder {
                                         authInteractionProperties,
                                     )
                                 } else {
+                                var FingerprintVib : Boolean = Settings.System.getIntForUser(
+                                            context.contentResolver,
+                                            Settings.System.FP_ERROR_VIBRATE, 1, UserHandle.USER_CURRENT) == 1
+                                if (FingerprintVib) {
                                     vibratorHelper.performHapticFeedback(
                                         view,
-                                        HapticFeedbackConstants.BIOMETRIC_REJECT,
+                                        HapticFeedbackConstants.CONFIRM,
+                                        HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING,
                                     )
+                                }
                                 }
                             }
                         }

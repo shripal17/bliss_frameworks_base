@@ -189,6 +189,7 @@ constructor(
                 configuration,
                 occludingAppDeviceEntryMessageViewModel,
                 chipbarCoordinator,
+                context,
                 screenOffAnimationController,
                 shadeInteractor,
                 clockInteractor,
