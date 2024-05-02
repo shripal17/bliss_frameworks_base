@@ -13470,6 +13470,12 @@ public final class Settings {
         public static final int RING_HOME_BUTTON_BEHAVIOR_DEFAULT =
                 RING_HOME_BUTTON_BEHAVIOR_DO_NOTHING;
 
+        /**
+         * Custom time when user is scheduled to deactivate
+         * @hide
+         */
+        public static final String USER_ACTIVITY_END_TIME = "user_activity_end_time";
+
 	/**
          * Our GameSpace can't write to device_config directly [GTS]
          * Use this as intermediate to pass device_config property
