@@ -503,6 +503,11 @@ public abstract class WindowDecoration<T extends View & TaskFocusStateConsumer>
      * Checks if task has entered/exited immersive mode and requires a change in caption visibility.
      */
     private void updateCaptionVisibility(View rootView) {
+        if (mTaskInfo.getWindowingMode() == WINDOWING_MODE_FREEFORM) {
+            mIsCaptionVisible = true;
+            return;
+        }
+
         // Caption should always be visible in freeform mode. When not in freeform, align with the
         // status bar except when showing over keyguard (where it should not shown).
         //  TODO(b/356405803): Investigate how it's possible for the status bar visibility to be
