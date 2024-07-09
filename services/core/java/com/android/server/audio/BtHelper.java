@@ -1191,7 +1191,7 @@ public class BtHelper {
                     && mBluetoothHeadsetDevice != null
                     && mScoAudioState == SCO_STATE_INACTIVE
                     && mBluetoothHeadset.getAudioState(mBluetoothHeadsetDevice)
-                        != BluetoothHeadset.STATE_AUDIO_DISCONNECTED) {
+                    != BluetoothHeadset.STATE_AUDIO_DISCONNECTED) {
                 mScoAudioState = SCO_STATE_ACTIVE_EXTERNAL;
             }
         } catch (Exception e) {
