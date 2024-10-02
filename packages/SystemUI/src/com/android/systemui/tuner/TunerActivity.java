@@ -19,6 +19,8 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
@@ -57,7 +59,10 @@ public class TunerActivity extends CollapsingToolbarBaseActivity implements
     }
 
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         setContentView(R.layout.tuner_activity);
 
         if (getFragmentManager().findFragmentByTag(TAG_TUNER) == null) {
