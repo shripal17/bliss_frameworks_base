@@ -458,5 +458,7 @@ public class SecureSettingsValidators {
         VALIDATORS.put(Secure.VPN_ENFORCE_DNS_STORE, new DiscreteValueValidator(new String[] {"-1", "0", "1", "2"}));
         VALIDATORS.put(Secure.DOZE_ON_CHARGE, BOOLEAN_VALIDATOR);
         VALIDATORS.put(Secure.USER_ACTIVITY_END_TIME, NONE_NEGATIVE_LONG_VALIDATOR);
+        VALIDATORS.put(Secure.QUICK_SETTINGS_TILES_ANIM_STYLE, ANY_INTEGER_VALIDATOR);
+        VALIDATORS.put(Secure.QUICK_SETTINGS_TILES_ANIM_DURATION, ANY_INTEGER_VALIDATOR);
     }
 }
