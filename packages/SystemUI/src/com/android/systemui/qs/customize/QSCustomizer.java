@@ -103,12 +103,6 @@ public class QSCustomizer extends LinearLayout {
         if (enabled != mSceneContainerEnabled) {
             mSceneContainerEnabled = enabled;
             updateTransparentViewHeight();
-            if (mSceneContainerEnabled) {
-                findViewById(R.id.nav_bar_background).setVisibility(View.GONE);
-            } else {
-                findViewById(R.id.nav_bar_background)
-                        .setVisibility(mIsShowingNavBackdrop ? View.VISIBLE : View.GONE);
-            }
         }
     }
 
