@@ -181,11 +181,11 @@ public final class PixelPropsUtils {
         propsToChangeRecentPixel.put("BRAND", "google");
         propsToChangeRecentPixel.put("MANUFACTURER", "Google");
         propsToChangeRecentPixel.put("DEVICE", "komodo");
-        propsToChangeRecentPixel.put("PRODUCT", "komodo_beta");
+        propsToChangeRecentPixel.put("PRODUCT", "komodo");
         propsToChangeRecentPixel.put("HARDWARE", "komodo");
         propsToChangeRecentPixel.put("MODEL", "Pixel 9 Pro XL");
-        propsToChangeRecentPixel.put("ID", "AP31.240617.015");
-        propsToChangeRecentPixel.put("FINGERPRINT", "google/komodo_beta/komodo:15/AP31.240617.015/12207491:user/release-keys");
+        propsToChangeRecentPixel.put("ID", "AP3A.241005.015");
+        propsToChangeRecentPixel.put("FINGERPRINT", "google/komodo/komodo:15/AP3A.241005.015/12366759:user/release-keys");
         propsToChangePixelTablet = new HashMap<>();
         propsToChangePixelTablet.put("BRAND", "google");
         propsToChangePixelTablet.put("MANUFACTURER", "Google");
@@ -193,8 +193,8 @@ public final class PixelPropsUtils {
         propsToChangePixelTablet.put("PRODUCT", "tangorpro");
         propsToChangePixelTablet.put("HARDWARE", "tangorpro");
         propsToChangePixelTablet.put("MODEL", "Pixel Tablet");
-        propsToChangePixelTablet.put("ID", "AP2A.240905.003");
-        propsToChangePixelTablet.put("FINGERPRINT", "google/tangorpro/tangorpro:14/AP2A.240905.003/12231197:user/release-keys");
+        propsToChangePixelTablet.put("ID", "AP3A.241005.015");
+        propsToChangePixelTablet.put("FINGERPRINT", "google/tangorpro/tangorpro:15/AP3A.241005.003/12366759:user/release-keys");
         propsToChangePixel5a = new HashMap<>();
         propsToChangePixel5a.put("BRAND", "google");
         propsToChangePixel5a.put("MANUFACTURER", "Google");
