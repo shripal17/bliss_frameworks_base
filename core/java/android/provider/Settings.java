@@ -6870,12 +6870,6 @@ public final class Settings {
          */
 
         /**
-         * Stores the array name of the values currently used for SpoofBuildGms
-         * @hide
-         */
-        public static final String PPU_SPOOF_BUILD_GMS_ARRAY = "ppu_spoof_build_gms_array";
-
-        /**
          * @hide
          */
         public static final String ENABLE_TASKBAR = "enable_taskbar";
