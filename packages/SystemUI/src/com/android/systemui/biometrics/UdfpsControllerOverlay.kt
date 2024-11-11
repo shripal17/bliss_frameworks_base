@@ -157,8 +157,6 @@ constructor(
 
     private var overlayTouchListener: TouchExplorationStateChangeListener? = null
 
-    private val frameworkDimming = context.getResources().getBoolean(
-        R.bool.config_udfpsFrameworkDimming)
     private val coreLayoutParams =
         WindowManager.LayoutParams(
                 WindowManager.LayoutParams.TYPE_NAVIGATION_BAR_PANEL,
@@ -177,20 +175,10 @@ constructor(
                 privateFlags =
                     WindowManager.LayoutParams.PRIVATE_FLAG_TRUSTED_OVERLAY or
                         WindowManager.LayoutParams.PRIVATE_FLAG_EXCLUDE_FROM_SCREEN_MAGNIFICATION
-                if (frameworkDimming) {
-                    flags = flags or WindowManager.LayoutParams.FLAG_DIM_BEHIND
-                }
                 // Avoid announcing window title.
                 accessibilityTitle = " "
                 inputFeatures = WindowManager.LayoutParams.INPUT_FEATURE_SPY
             }
-
-    var dimAmount
-        get() = coreLayoutParams.dimAmount
-        set(value) {
-            coreLayoutParams.dimAmount = value
-            windowManager.updateViewLayout(overlayViewLegacy, coreLayoutParams)
-        }
 
     /** If the overlay is currently showing. */
     val isShowing: Boolean
@@ -485,12 +473,9 @@ constructor(
                 else -> false
             }
 
-        val customUdfpsIcon = Settings.System.getInt(context.contentResolver,
-            Settings.System.UDFPS_ICON, 0) != 0
-
         // Use expanded overlay unless touchExploration enabled
         var rotatedBounds =
-            if (customUdfpsIcon || (accessibilityManager.isTouchExplorationEnabled && isEnrollment)) {
+            if (accessibilityManager.isTouchExplorationEnabled && isEnrollment) {
                 Rect(overlayParams.sensorBounds)
             } else {
                 Rect(0, 0, overlayParams.naturalDisplayWidth, overlayParams.naturalDisplayHeight)
@@ -516,14 +501,12 @@ constructor(
                     rot
                 )
 
-                if (!customUdfpsIcon) {
-                    RotationUtils.rotateBounds(
-                        sensorBounds,
-                        overlayParams.naturalDisplayWidth,
-                        overlayParams.naturalDisplayHeight,
-                        rot
-                    )
-                }
+                RotationUtils.rotateBounds(
+                    sensorBounds,
+                    overlayParams.naturalDisplayWidth,
+                    overlayParams.naturalDisplayHeight,
+                    rot
+                )
             }
         }
 

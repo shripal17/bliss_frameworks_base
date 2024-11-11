@@ -21,15 +21,12 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
-import android.provider.Settings
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
-import android.view.Surface
 import android.widget.FrameLayout
 import com.android.systemui.biometrics.shared.model.UdfpsOverlayParams
 import com.android.systemui.doze.DozeReceiver
-import com.android.systemui.res.R
 
 private const val TAG = "UdfpsView"
 
@@ -49,8 +46,6 @@ class UdfpsView(
         color = Color.BLUE
         textSize = 32f
     }
-
-    private var ghbmView: UdfpsSurfaceView? = null
 
     /** View controller (can be different for enrollment, BiometricPrompt, Keyguard, etc.). */
     var animationViewController: UdfpsAnimationViewController<*>? = null
@@ -78,10 +73,6 @@ class UdfpsView(
         return (animationViewController == null || !animationViewController!!.shouldPauseAuth())
     }
 
-    override fun onFinishInflate() {
-        ghbmView = findViewById(R.id.hbm_view)
-    }
-
     override fun dozeTimeTick() {
         animationViewController?.dozeTimeTick()
     }
@@ -89,25 +80,8 @@ class UdfpsView(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
-        val customUdfpsIcon = Settings.System.getInt(context.contentResolver,
-            Settings.System.UDFPS_ICON, 0) != 0
-
         // Updates sensor rect in relation to the overlay view
-        if (!customUdfpsIcon) {
-            animationViewController?.onSensorRectUpdated(RectF(sensorRect))
-        } else {
-            val paddingX = animationViewController?.paddingX ?: 0
-            val paddingY = animationViewController?.paddingY ?: 0
-
-            sensorRect.set(
-                    paddingX,
-                    paddingY,
-                    (overlayParams.sensorBounds.width() + paddingX),
-                    (overlayParams.sensorBounds.height() + paddingY)
-            )
-
-            animationViewController?.onSensorRectUpdated(RectF(sensorRect))
-        }
+        animationViewController?.onSensorRectUpdated(RectF(sensorRect))
     }
 
     override fun onAttachedToWindow() {
@@ -132,34 +106,12 @@ class UdfpsView(
     fun configureDisplay(onDisplayConfigured: Runnable) {
         isDisplayConfigured = true
         animationViewController?.onDisplayConfiguring()
-        val gView = ghbmView
-        if (gView != null) {
-            gView.setGhbmIlluminationListener(this::doIlluminate)
-            gView.visibility = VISIBLE
-            gView.startGhbmIllumination(onDisplayConfigured)
-        } else {
-            doIlluminate(null /* surface */, onDisplayConfigured)
-        }
-    }
-
-    private fun doIlluminate(surface: Surface?, onDisplayConfigured: Runnable?) {
-        if (ghbmView != null && surface == null) {
-            Log.e(TAG, "doIlluminate | surface must be non-null for GHBM")
-        }
-
-        mUdfpsDisplayMode?.enable {
-            onDisplayConfigured?.run()
-            ghbmView?.drawIlluminationDot(RectF(sensorRect))
-        }
+        mUdfpsDisplayMode?.enable(onDisplayConfigured)
     }
 
     fun unconfigureDisplay() {
         isDisplayConfigured = false
         animationViewController?.onDisplayUnconfigured()
-        ghbmView?.let { view ->
-            view.setGhbmIlluminationListener(null)
-            view.visibility = INVISIBLE
-        }
         mUdfpsDisplayMode?.disable(null /* onDisabled */)
     }
 }
