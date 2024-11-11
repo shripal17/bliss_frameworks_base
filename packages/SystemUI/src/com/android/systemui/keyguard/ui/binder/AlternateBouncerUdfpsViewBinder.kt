@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.android.app.tracing.coroutines.launch
 import com.android.systemui.Dependency
+import com.android.systemui.biometrics.UdfpsIconDrawable
 import com.android.systemui.deviceentry.shared.DeviceEntryUdfpsRefactor
 import com.android.systemui.keyguard.ui.view.DeviceEntryIconView
 import com.android.systemui.keyguard.ui.viewmodel.AlternateBouncerUdfpsIconViewModel
@@ -106,12 +107,12 @@ object AlternateBouncerUdfpsViewBinder {
                         /* merge */ false
                     )
                     fgIconView.imageTintList = ColorStateList.valueOf(fgViewModel.tint)
-                    if (!shouldUseCustomUdfpsIcon.value || !packageInstalled) {
+                    if (fgIconView.drawable.current !is UdfpsIconDrawable) {
                         fgIconView.setPadding(
                             fgViewModel.padding,
                             fgViewModel.padding,
                             fgViewModel.padding,
-                            fgViewModel.padding,
+                            fgViewModel.padding
                         )
                     } else {
                         fgIconView.setPadding(0, 0, 0, 0)
