@@ -29,6 +29,7 @@ import androidx.core.view.isInvisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.android.app.tracing.coroutines.launch
+import com.android.systemui.Dependency
 import com.android.systemui.common.ui.view.LongPressHandlingView
 import com.android.systemui.deviceentry.shared.DeviceEntryUdfpsRefactor
 import com.android.systemui.keyguard.ui.view.DeviceEntryIconView
@@ -40,14 +41,26 @@ import com.android.systemui.plugins.FalsingManager
 import com.android.systemui.res.R
 import com.android.systemui.statusbar.VibratorHelper
 import com.android.systemui.util.kotlin.DisposableHandles
+import com.android.systemui.tuner.TunerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
+import android.provider.Settings
+import android.os.UserHandle
+import com.android.internal.util.bliss.BlissUtils
 
 @ExperimentalCoroutinesApi
 object DeviceEntryIconViewBinder {
     private const val TAG = "DeviceEntryIconViewBinder"
+
+    private final val UDFPS_ICON: String =
+            "system:" + Settings.System.UDFPS_ICON
 
     /**
      * Updates UI for:
@@ -68,6 +81,27 @@ object DeviceEntryIconViewBinder {
         vibratorHelper: VibratorHelper,
         overrideColor: Color? = null,
     ): DisposableHandle {
+        val packageInstalled = BlissUtils.isPackageInstalled(
+            view.context, "org.bliss.udfps.icons"
+        )
+
+        val shouldUseCustomUdfpsIcon: StateFlow<Boolean> = callbackFlow {
+            val callback = object : TunerService.Tunable {
+                override fun onTuningChanged(key: String, newValue: String?) {
+                    if (key == UDFPS_ICON) {
+                        trySend(TunerService.parseIntegerSwitch(newValue, false)).isSuccess
+                    }
+                }
+            }
+            Dependency.get(TunerService::class.java).addTunable(callback, UDFPS_ICON)
+
+            awaitClose { Dependency.get(TunerService::class.java).removeTunable(callback) }
+        }.stateIn(
+            scope = applicationScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
+
         DeviceEntryUdfpsRefactor.isUnexpectedlyInLegacyMode()
         val disposables = DisposableHandles()
         val longPressHandlingView = view.longPressHandlingView
@@ -162,10 +196,19 @@ object DeviceEntryIconViewBinder {
                     }
                     launch("$TAG#viewModel.useBackgroundProtection") {
                         viewModel.useBackgroundProtection.collect { useBackgroundProtection ->
-                            if (useBackgroundProtection) {
-                                bgView.visibility = View.VISIBLE
-                            } else {
+                            if (shouldUseCustomUdfpsIcon.value && packageInstalled) {
                                 bgView.visibility = View.GONE
+                            } else {
+                                bgView.visibility = if (useBackgroundProtection) View.VISBILE else View.GONE
+                            }
+                        }
+                    }
+                    launch("$TAG#shouldUseCustomUdfpsIcon") {
+                        shouldUseCustomUdfpsIcon.collect { useCustomIcon ->
+                            if (useCustomIcon && packageInstalled) {
+                                bgView.visibility = View.GONE
+                            } else {
+                                bgView.visibility = if (viewModel.useBackgroundProtecton.value) View.VISBILE else View.GONE
                             }
                         }
                     }
@@ -202,12 +245,16 @@ object DeviceEntryIconViewBinder {
                             }
                             fgIconView.imageTintList =
                                 ColorStateList.valueOf(overrideColor?.toArgb() ?: viewModel.tint)
-                            fgIconView.setPadding(
-                                viewModel.padding,
-                                viewModel.padding,
-                                viewModel.padding,
-                                viewModel.padding,
-                            )
+                            if (!shouldUseCustomUdfpsIcon.value || !packageInstalled) {
+                                fgIconView.setPadding(
+                                    viewModel.padding,
+                                    viewModel.padding,
+                                    viewModel.padding,
+                                    viewModel.padding,
+                                )
+                            } else {
+                                fgIconView.setPadding(0, 0, 0, 0)
+                            }
                         }
                     }
                 }
