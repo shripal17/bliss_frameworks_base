@@ -64,16 +64,28 @@ public final class GamesPropsUtils {
 
     private static final Map<String, Object> propsToChangeOP9P = createMap("LE2101", "OnePlus");
     private static final String[] packagesToChangeOP9P = { // spoof as OnePlus 9 PRO
-            "com.epicgames.fortnite",
             "com.epicgames.portal",
             "com.tencent.lolm"
     };
 
-    private static final Map<String, Object> propsToChangeF5 = createMap("23049PCD8G", "Xiaomi");
-    private static final String[] packagesToChangeF5 = { // spoof as POCO F5
+    private static final Map<String, Object> propsToChangeOP12 = createMap("PJD110", "OnePlus");
+    private static final String[] packagesToChangeOP12 = { // spoof as Oneplus 12
             "com.dts.freefiremax",
             "com.dts.freefireth",
-            "com.mobile.legends"
+            "com.mobile.legends",
+	    "com.activision.callofduty.shooter",
+	    "com.activision.callofduty.warzone",
+	    "com.garena.game.codm",
+	    "com.tencent.tmgp.kr.codm",
+	    "com.vng.codmvn",
+	    "com.tencent.tmgp.cod",
+	    "com.tencent.ig",
+	    "com.pubg.imobile",
+	    "com.pubg.krmobile",
+	    "com.rekoo.pubgm",
+	    "com.vng.pubgmobile",
+	    "com.tencent.tmgp.pubgmhd",
+	    "com.epicgames.fortnite"
     };
 
     private static final Map<String, Object> propsToChangeROG6 = createMap("ASUS_AI2201", "asus");
@@ -83,24 +95,6 @@ public final class GamesPropsUtils {
             "com.madfingergames.legends",
             "com.pearlabyss.blackdesertm",
             "com.pearlabyss.blackdesertm.gl"
-    };
-
-    private static final Map<String, Object> propsToChangeROG8P = createMap("ASUS_AI2401_A", "asus");
-    private static final String[] packagesToChangeROG8P = { // spoof as ROG Phone 8 Pro
-            "com.pubg.imobile",
-            "com.pubg.krmobile",
-            "com.rekoo.pubgm",
-            "com.tencent.ig",
-            "com.tencent.tmgp.pubgmhd",
-            "com.vng.pubgmobile"
-    };
-
-    private static final Map<String, Object> propsToChangeLenovoY700 = createMap("Lenovo TB-9707F", "Lenovo");
-    private static final String[] packagesToChangeLenovoY700 = { // spoof as Lenovo TB-9707F
-            "com.activision.callofduty.shooter",
-            "com.garena.game.codm",
-            "com.tencent.tmgp.kr.codm",
-            "com.vng.codmvn"
     };
 
     private static Map<String, Object> createMap(String model, String manufacturer) {
@@ -130,14 +124,10 @@ public final class GamesPropsUtils {
                 propsToChange = propsToChangeOP8P;
             } else if (Arrays.asList(packagesToChangeOP9P).contains(packageName)) {
                 propsToChange = propsToChangeOP9P;
-            } else if (Arrays.asList(packagesToChangeF5).contains(packageName)) {
-                propsToChange = propsToChangeF5;
+            } else if (Arrays.asList(packagesToChangeOP12).contains(packageName)) {
+                propsToChange = propsToChangeOP12;
             } else if (Arrays.asList(packagesToChangeROG6).contains(packageName)) {
                 propsToChange = propsToChangeROG6;
-            } else if (Arrays.asList(packagesToChangeROG8P).contains(packageName)) {
-                propsToChange = propsToChangeROG8P;
-            } else if (Arrays.asList(packagesToChangeLenovoY700).contains(packageName)) {
-                propsToChange = propsToChangeLenovoY700;
             }
         }
         if (propsToChange != null) {
