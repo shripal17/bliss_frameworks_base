@@ -175,7 +175,7 @@ public final class PixelPropsUtils {
         "FINGERPRINT", "google/akita_beta/akita:15/AP41.240925.009/12534705:user/release-keys",
         "MODEL", "Pixel 8a",
         "PRODUCT", "akita_beta",
-        "DEVICE_INITIAL_SDK_INT", "25",
+        "DEVICE_INITIAL_SDK_INT", "21",
         "SECURITY_PATCH", "2024-10-05",
         "ID", "AP41.240925.009"
     );
