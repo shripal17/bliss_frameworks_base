@@ -64,11 +64,13 @@ import com.android.systemui.statusbar.notification.icon.ui.viewbinder.Notificati
 import com.android.systemui.statusbar.phone.ClockController;
 import com.android.systemui.statusbar.phone.NotificationIconContainer;
 import com.android.systemui.statusbar.phone.PhoneStatusBarView;
+import com.android.systemui.statusbar.phone.PhoneStatusBarViewController;
 import com.android.systemui.statusbar.phone.StatusBarHideIconsForBouncerManager;
 import com.android.systemui.statusbar.phone.StatusBarLocation;
 import com.android.systemui.statusbar.phone.StatusBarLocationPublisher;
 import com.android.systemui.statusbar.phone.fragment.dagger.StatusBarFragmentComponent;
 import com.android.systemui.statusbar.phone.fragment.dagger.StatusBarFragmentComponent.Startable;
+import com.android.systemui.statusbar.phone.fragment.dagger.StatusBarFragmentScope;
 import com.android.systemui.statusbar.phone.ongoingcall.OngoingCallController;
 import com.android.systemui.statusbar.phone.ongoingcall.OngoingCallListener;
 import com.android.systemui.statusbar.phone.ui.DarkIconManager;
@@ -157,6 +159,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private final DemoModeController mDemoModeController;
 
     private ClockController mClockController;
+    private PhoneStatusBarViewController mStatusBarViewController;
 
     private List<String> mBlockedIcons = new ArrayList<>();
     private Map<Startable, Startable.State> mStartableStates = new ArrayMap<>();
@@ -352,6 +355,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             mStartableStates.put(startable, Startable.State.STARTED);
         }
 
+        mStatusBarViewController = mStatusBarFragmentComponent
+                .getPhoneStatusBarViewController();
+        mClockController = mStatusBarViewController.getClockController();
         mStatusBar = (PhoneStatusBarView) view;
         View contents = mStatusBar.findViewById(R.id.status_bar_contents);
         contents.addOnLayoutChangeListener(mStatusBarLayoutListener);
@@ -368,7 +374,6 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mEndSideContent = mStatusBar.findViewById(R.id.status_bar_end_side_content);
         mEndSideAlphaController = new MultiSourceMinAlphaController(mEndSideContent);
         mBatteryBar = mStatusBar.findViewById(R.id.battery_bar);
-        mClockController = mStatusBar.getClockController();
         mPrimaryOngoingActivityChip = mStatusBar.findViewById(R.id.ongoing_activity_chip_primary);
         mSecondaryOngoingActivityChip =
                 mStatusBar.findViewById(R.id.ongoing_activity_chip_secondary);
@@ -637,8 +642,6 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                     && shouldHideStatusBar()
                     && !(mStatusBarStateController.getState() == StatusBarState.KEYGUARD
                     && headsUpVisible)) {
-            View clockView = mClockController.getClock();
-            boolean isRightClock = clockView.getId() == R.id.clock_right;
                 return createHiddenModel();
             }
         }
@@ -660,8 +663,10 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                         && StatusBarRonChips.isEnabled()
                         && mHasSecondaryOngoingActivity;
 
+        View clockView = mClockController.getClock();
+        boolean isRightClock = clockView.getId() == R.id.clock_right;
         return new StatusBarVisibilityModel(
-                /* showClock= */ isRightClock,
+                showClock || isRightClock,
                 externalModel.getShowNotificationIcons(),
                 showPrimaryOngoingActivityChip && !headsUpVisible,
                 showSecondaryOngoingActivityChip && !headsUpVisible,
