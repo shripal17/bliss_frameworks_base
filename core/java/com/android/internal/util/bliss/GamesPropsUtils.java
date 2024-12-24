@@ -97,6 +97,24 @@ public final class GamesPropsUtils {
             "com.pearlabyss.blackdesertm.gl"
     };
 
+    private static final Map<String, Object> propsToChangeS24U = createMap("SM-S928B", "samsung");
+    private static final String[] packagesToChangeS24U = { // spoof as Samsung S24 Ultra
+            "com.pubg.imobile",
+            "com.pubg.krmobile",
+            "com.rekoo.pubgm",
+            "com.tencent.ig",
+            "com.tencent.tmgp.pubgmhd",
+            "com.vng.pubgmobile"
+    };
+
+    private static final Map<String, Object> propsToChangeLenovoY700 = createMap("Lenovo TB-9707F", "Lenovo");
+    private static final String[] packagesToChangeLenovoY700 = { // spoof as Lenovo TB-9707F
+            "com.activision.callofduty.shooter",
+            "com.garena.game.codm",
+            "com.tencent.tmgp.kr.codm",
+            "com.vng.codmvn"
+    };
+
     private static Map<String, Object> createMap(String model, String manufacturer) {
         Map<String, Object> map = new HashMap<>();
         map.put("MODEL", model);
@@ -128,6 +146,10 @@ public final class GamesPropsUtils {
                 propsToChange = propsToChangeOP12;
             } else if (Arrays.asList(packagesToChangeROG6).contains(packageName)) {
                 propsToChange = propsToChangeROG6;
+            } else if (Arrays.asList(packagesToChangeS24U).contains(packageName)) {
+                propsToChange = propsToChangeS24U;
+            } else if (Arrays.asList(packagesToChangeLenovoY700).contains(packageName)) {
+                propsToChange = propsToChangeLenovoY700;
             }
         }
         if (propsToChange != null) {
