@@ -13720,14 +13720,6 @@ public final class Settings {
                 "quick_settings_tiles_anim_duration";
 
         /**
-         * Change quick settings tiles interpolator
-         *
-         * @hide
-         */
-        public static final String QUICK_SETTINGS_TILES_ANIM_INTERPOLATOR =
-                "quick_settings_tiles_anim_interpolator";
-
-        /**
          * Whether to show the brightness slider in quick settings panel.
          * 0 = Top, 1 = Bottom
          * @hide
