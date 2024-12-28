@@ -7348,11 +7348,6 @@ public final class Settings {
         public static final String UDFPS_ANIM_STYLE = "udfps_anim_style";
 
         /**
-         * @hide
-         */
-        public static final String UDFPS_ICON = "udfps_icon";
-
-        /**
          * Network traffic indicator
          * 0 = Disabled
          * 1 = Enabled

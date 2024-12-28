@@ -46,7 +46,6 @@ import com.android.systemui.log.LongPressHandlingViewLogger
 import com.android.systemui.res.R
 import com.android.systemui.scene.shared.flag.SceneContainerFlag
 import com.android.systemui.scrim.ScrimView
-import com.android.systemui.tuner.TunerService
 import dagger.Lazy
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +68,6 @@ constructor(
     private val alternateBouncerDependencies: Lazy<AlternateBouncerDependencies>,
     private val windowManager: Lazy<WindowManager>,
     private val layoutInflater: Lazy<LayoutInflater>,
-    private val tunerService: TunerService,
 ) : CoreStartable {
     private val layoutParams: WindowManager.LayoutParams
         get() =
@@ -281,7 +279,7 @@ constructor(
                         var udfpsView = view.getViewById(udfpsViewId)
                         if (udfpsView == null) {
                             udfpsView =
-                                DeviceEntryIconView(view.context, null, 0, tunerService, logger = logger).apply {
+                                DeviceEntryIconView(view.context, null, logger = logger).apply {
                                     id = udfpsViewId
                                     contentDescription =
                                         context.resources.getString(
@@ -290,7 +288,6 @@ constructor(
                                 }
                             view.addView(udfpsView)
                             AlternateBouncerUdfpsViewBinder.bind(
-                                applicationScope,
                                 udfpsView,
                                 udfpsIconViewModel,
                             )
