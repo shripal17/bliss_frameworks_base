@@ -13704,22 +13704,6 @@ public final class Settings {
         public static final String HIDE_DEVELOPER_STATUS = "hide_developer_status";
 
         /**
-         * Change quick settings tiles animation style
-         *
-         * @hide
-         */
-        public static final String QUICK_SETTINGS_TILES_ANIM_STYLE =
-                "quick_settings_tiles_anim_style";
-
-        /**
-         * Change quick settings tiles animation duration
-         *
-         * @hide
-         */
-        public static final String QUICK_SETTINGS_TILES_ANIM_DURATION =
-                "quick_settings_tiles_anim_duration";
-
-        /**
          * Whether to show the brightness slider in quick settings panel.
          * 0 = Top, 1 = Bottom
          * @hide
